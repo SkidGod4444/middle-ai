@@ -10,7 +10,7 @@ import {
 } from "@/lib/db/queries";
 import { myProvider } from "@/lib/ai/models";
 
-import { createAdminClient, createSessionClient } from "./appwrite/server";
+import { createAdminClient } from "./appwrite/server";
 import { ID } from "appwrite";
 
 export async function saveChatModelAsCookie(model: string) {
