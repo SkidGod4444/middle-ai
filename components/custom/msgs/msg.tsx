@@ -1,27 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-'use client';
+"use client";
 
-import type { ChatRequestOptions, Message } from 'ai';
-import cx from 'classnames';
-import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useState } from 'react';
+import type { ChatRequestOptions, Message } from "ai";
+import cx from "classnames";
+import { AnimatePresence, motion } from "framer-motion";
+import { memo, useState } from "react";
 
-import type { Vote } from '@/lib/db/schema';
+
 // import { Weather } from './weather';
-import equal from 'fast-deep-equal';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
-import { PencilIcon, SparklesIcon } from 'lucide-react';
-import { MessageEditor } from './editor';
-import { Markdown } from '../markdown';
-import { MessageReasoning } from './reasoning';
-import { MessageActions } from './actions';
+import equal from "fast-deep-equal";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { PencilIcon, SparklesIcon } from "lucide-react";
+import { MessageEditor } from "./editor";
+import { Markdown } from "../markdown";
+import { MessageReasoning } from "./reasoning";
+import { MessageActions } from "./actions";
 
 const PurePreviewMessage = ({
   chatId,
   message,
-  vote,
   isLoading,
   setMessages,
   reload,
@@ -29,17 +32,16 @@ const PurePreviewMessage = ({
 }: {
   chatId: string;
   message: Message;
-  vote: Vote | undefined;
   isLoading: boolean;
   setMessages: (
-    messages: Message[] | ((messages: Message[]) => Message[]),
+    messages: Message[] | ((messages: Message[]) => Message[])
   ) => void;
   reload: (
-    chatRequestOptions?: ChatRequestOptions,
+    chatRequestOptions?: ChatRequestOptions
   ) => Promise<string | null | undefined>;
   isReadonly: boolean;
 }) => {
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [mode, setMode] = useState<"view" | "edit">("view");
 
   return (
     <AnimatePresence>
@@ -51,14 +53,15 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
+            "flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl",
             {
-              'w-full': mode === 'edit',
-              'group-data-[role=user]/message:w-fit': mode !== 'edit',
-            },
+              "w-full": mode === "edit",
+              "group-data-[role=user]/message:w-fit": mode !== "edit",
+              "group-data-[role=user]/message:justify-end": mode === "edit",
+            }
           )}
         >
-          {message.role === 'assistant' && (
+          {message.role === "assistant" && (
             <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
               <div className="translate-y-px">
                 <SparklesIcon size={14} />
@@ -73,16 +76,16 @@ const PurePreviewMessage = ({
             />
           )}
 
-          {(message.content || message.reasoning) && mode === 'view' && (
+          {(message.content || message.reasoning) && mode === "view" && (
             <div className="flex flex-row gap-2 items-start">
-              {message.role === 'user' && !isReadonly && (
+              {message.role === "user" && !isReadonly && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
                       onClick={() => {
-                        setMode('edit');
+                        setMode("edit");
                       }}
                     >
                       <PencilIcon />
@@ -93,9 +96,9 @@ const PurePreviewMessage = ({
               )}
 
               <div
-                className={cn('flex flex-col gap-4', {
-                  'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                    message.role === 'user',
+                className={cn("flex flex-col gap-4", {
+                  "bg-primary text-primary-foreground px-3 py-2 rounded-xl":
+                    message.role === "user",
                 })}
               >
                 <Markdown>{message.content as string}</Markdown>
@@ -103,8 +106,8 @@ const PurePreviewMessage = ({
             </div>
           )}
 
-          {message.content && mode === 'edit' && (
-            <div className="flex flex-row gap-2 items-start">
+          {message.content && mode === "edit" && (
+            <div className="flex flex-row gap-2  group-data-[role=user]/message:justify-end">
               <div className="size-8" />
 
               <MessageEditor
@@ -122,7 +125,7 @@ const PurePreviewMessage = ({
               {message.toolInvocations.map((toolInvocation) => {
                 const { toolName, toolCallId, state, args } = toolInvocation;
 
-                if (state === 'result') {
+                if (state === "result") {
                   const { result } = toolInvocation;
 
                   return (
@@ -157,7 +160,7 @@ const PurePreviewMessage = ({
                   <div
                     key={toolCallId}
                     className={cx({
-                      skeleton: ['getWeather'].includes(toolName),
+                      skeleton: ["getWeather"].includes(toolName),
                     })}
                   >
                     {/* {toolName === 'getWeather' ? (
@@ -188,7 +191,6 @@ const PurePreviewMessage = ({
               key={`action-${message.id}`}
               chatId={chatId}
               message={message}
-              vote={vote}
               isLoading={isLoading}
             />
           )}
@@ -208,18 +210,17 @@ export const PreviewMessage = memo(
     if (
       !equal(
         prevProps.message.toolInvocations,
-        nextProps.message.toolInvocations,
+        nextProps.message.toolInvocations
       )
     )
       return false;
-    if (!equal(prevProps.vote, nextProps.vote)) return false;
 
     return true;
-  },
+  }
 );
 
 export const ThinkingMessage = () => {
-  const role = 'assistant';
+  const role = "assistant";
 
   return (
     <motion.div
@@ -230,10 +231,10 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl',
+          "flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl",
           {
-            'group-data-[role=user]/message:bg-muted': true,
-          },
+            "group-data-[role=user]/message:bg-muted": true,
+          }
         )}
       >
         <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">

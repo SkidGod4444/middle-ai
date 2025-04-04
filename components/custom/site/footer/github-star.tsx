@@ -1,7 +1,7 @@
-"use client";
+
 // import { fetchGithubStars } from "../../../../lib/fetch-github-stars";
 
-export async function GithubStars() {
+export function GithubStars() {
 //   const data = await fetchGithubStars();
 
   return (

@@ -1,19 +1,20 @@
-'use client';
+"use client";
 
-import { ChatRequestOptions, Message } from 'ai';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { ChatRequestOptions, Message } from "ai";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 // import { deleteTrailingMessages } from '@/app/(chat)/actions';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { deleteTrailingMessages } from "@/lib/actions";
 
 export type MessageEditorProps = {
   message: Message;
-  setMode: Dispatch<SetStateAction<'view' | 'edit'>>;
+  setMode: Dispatch<SetStateAction<"view" | "edit">>;
   setMessages: (
-    messages: Message[] | ((messages: Message[]) => Message[]),
+    messages: Message[] | ((messages: Message[]) => Message[])
   ) => void;
   reload: (
-    chatRequestOptions?: ChatRequestOptions,
+    chatRequestOptions?: ChatRequestOptions
   ) => Promise<string | null | undefined>;
 };
 
@@ -36,8 +37,10 @@ export function MessageEditor({
 
   const adjustHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 2}px`;
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${
+        textareaRef.current.scrollHeight + 2
+      }px`;
     }
   };
 
@@ -60,7 +63,7 @@ export function MessageEditor({
           variant="outline"
           className="h-fit py-2 px-3"
           onClick={() => {
-            setMode('view');
+            setMode("view");
           }}
         >
           Cancel
@@ -72,16 +75,24 @@ export function MessageEditor({
           onClick={async () => {
             setIsSubmitting(true);
 
-            // await deleteTrailingMessages({
-            //   id: message.id,
-            // });
+            await deleteTrailingMessages({
+              id: message.id,
+            });
 
             setMessages((messages) => {
               const index = messages.findIndex((m) => m.id === message.id);
+              console.log("previous messages", messages);
+              console.log("index", messages[index]);
 
               if (index !== -1) {
                 const updatedMessage = {
                   ...message,
+                  parts: message.parts?.map((part) => {
+                    if (part.type === "text") {
+                      return { ...part, text: draftContent };
+                    }
+                    return part;
+                  }),
                   content: draftContent,
                 };
 
@@ -91,11 +102,11 @@ export function MessageEditor({
               return messages;
             });
 
-            setMode('view');
+            setMode("view");
             reload();
           }}
         >
-          {isSubmitting ? 'Sending...' : 'Send'}
+          {isSubmitting ? "Sending..." : "Send"}
         </Button>
       </div>
     </div>

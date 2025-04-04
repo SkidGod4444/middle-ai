@@ -5,13 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { OTPInput } from './otp-input';
 import PHNInput from './phn-input';
 import { Button } from '../ui/button';
-import account from '@/lib/appwrite/init';
-import { ID } from 'appwrite';
 import useLocalStorage from '@/hooks/use-local';
 import { Loader } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { createSession, createToken } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
 
 export default function SignInBtn() {
+    const router = useRouter();
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
     const [loading, setLoading] = useState(false);
     const [storedPhn, setStoredPhn] = useLocalStorage('mai-phn', '');
@@ -20,22 +20,19 @@ export default function SignInBtn() {
     const [uid, setUID] = useState(storedUserId as string);
 
     const handleOTP = async (otp: string) => {
+
         console.log("Completed OTP:", otp);
         try {
             if(otp && uid){
-                const session = await account.createSession(
-                    uid,
-                    otp
-                );
+               const session = await createSession(uid, otp);
                 if(session){
-                    console.log(session);
+
                     setStatus("success");
                     setUID('');
-                    redirect("/dashboard");
+                    router.push("/dashboard");
                 } else {
                     setStatus("error");
-                    console.log(session);
-                    redirect("/auth");
+                    router.push("/auth");
                 }
             }
         } catch (error) {
@@ -49,10 +46,7 @@ export default function SignInBtn() {
                 console.log('phone no:', phone);
                 setStoredPhn(phone);
                 setLoading(true);
-                const token = await account.createPhoneToken(
-                    ID.unique(),
-                    phone
-                );
+                const token = await createToken(phone);
                 console.log('token:', token)
                 if (token) {
                     setUserId(token.userId);

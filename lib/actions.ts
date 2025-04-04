@@ -1,18 +1,21 @@
-'use server';
+"use server";
 
-import { generateText, Message } from 'ai';
-import { cookies } from 'next/headers';
+import { generateText, Message } from "ai";
+import { cookies } from "next/headers";
 
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
-//   updateChatVisiblityById,
-} from '@/lib/db/queries';
-import { myProvider } from '@/lib/ai/models';
+  //   updateChatVisiblityById,
+} from "@/lib/db/queries";
+import { myProvider } from "@/lib/ai/models";
+
+import { createAdminClient, createSessionClient } from "./appwrite/server";
+import { ID } from "appwrite";
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
-  cookieStore.set('chat-model', model);
+  cookieStore.set("chat-model", model);
 }
 
 export async function generateTitleFromUserMessage({
@@ -21,7 +24,7 @@ export async function generateTitleFromUserMessage({
   message: Message;
 }) {
   const { text: title } = await generateText({
-    model: myProvider.languageModel('title-model'),
+    model: myProvider.languageModel("title-model"),
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long
@@ -51,3 +54,21 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
 // }) {
 //   await updateChatVisiblityById({ chatId, visibility });
 // }
+
+export const createSession = async (uid: string, otp: string) => {
+  const { account } = await createAdminClient();
+  const session = await account.createSession(uid, otp);
+  console.log("session",session)
+  console.log("session", session);
+  if (session) {
+    (await cookies()).set("session", session.secret);
+  }
+  return session;
+};
+
+export const createToken = async (phone: string) => {
+  const { account } = await createAdminClient();
+  const token = await account.createPhoneToken(ID.unique(), phone);
+  console.log("token", token);
+  return token;
+};
