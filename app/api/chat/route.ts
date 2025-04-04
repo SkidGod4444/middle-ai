@@ -3,13 +3,11 @@ import {
   createDataStreamResponse,
   smoothStream,
   streamText,
-  convertToCoreMessages,
 } from "ai";
 import { myProvider } from "@/lib/ai/models";
 import { systemPrompt } from "@/lib/ai/prompts";
 import {
   deleteChatById,
-  // deleteChatById,
   getChatById,
   saveChat,
   saveMessages,
@@ -21,8 +19,6 @@ import {
 } from "@/lib/utils";
 import { generateTitleFromUserMessage } from "@/lib/actions";
 import { getLoggedInUser } from "@/lib/appwrite/server";
-import { cookies } from "next/headers";
-//   import { getWeather } from '@/lib/ai/tools/get-weather';
 
 export const maxDuration = 60;
 
@@ -124,7 +120,7 @@ export async function POST(request: Request) {
         sendReasoning: true,
       });
     },
-    onError: (error) => {
+    onError: () => {
       return "Oops, an error occured!";
     },
   });
@@ -155,7 +151,7 @@ export async function POST(request: Request) {
 
       return new Response('Chat deleted', { status: 200 });
     } catch (error) {
-      return new Response('An error occurred while processing your request', {
+      return new Response('An error occurred while processing your request' + error, {
         status: 500,
       });
     }

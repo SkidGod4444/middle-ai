@@ -42,6 +42,7 @@ export async function getLoggedInUser() {
     const user = await account.get();
     return user;
   } catch (error) {
+    console.error("Error getting logged in user", error);
     return null;
   }
 }

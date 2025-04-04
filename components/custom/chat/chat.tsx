@@ -3,8 +3,7 @@
 import type { Attachment, Message } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import {  useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-// import { ChatHeader } from '@/components/chat-header';
+import  { useSWRConfig } from 'swr';
 import {  generateUUID } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Messages } from '../msgs/messages';
